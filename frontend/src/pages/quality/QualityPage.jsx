@@ -35,7 +35,7 @@ export default function QualityPage() {
       <PageHeader
         title="Quality control"
         description="Every roll checked before packing, every defect traceable to its order and loom."
-        actions={hasRole('PRODUCTION_MANAGER') && <Button icon={Plus} onClick={() => setIsAddingRoll(true)}>New roll</Button>}
+        actions={hasRole('PRODUCTION_MANAGER', 'QUALITY_INSPECTOR') && <Button icon={Plus} onClick={() => setIsAddingRoll(true)}>New roll</Button>}
       />
       <div className="stack">
         <div className="grid grid--stats">
@@ -139,10 +139,10 @@ function DefectAnalysis({ summary }) {
       <Card title="Most common defects" subtitle="Last 30 days. Fix the top bar first.">
         <ResponsiveContainer width="100%" height={260}>
           <BarChart data={chartData} layout="vertical" margin={{ left: 30, right: 16 }}>
-            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#eef1f6" />
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#efeae0" />
             <XAxis type="number" tickLine={false} axisLine={false} fontSize={12} />
             <YAxis type="category" dataKey="name" tickLine={false} axisLine={false} fontSize={12} width={120} />
-            <Tooltip cursor={{ fill: '#f4f6fa' }} />
+            <Tooltip cursor={{ fill: '#f6f3ec' }} />
             <Bar dataKey="occurrences" fill="#ef6820" radius={[0, 4, 4, 0]} maxBarSize={22} />
           </BarChart>
         </ResponsiveContainer>

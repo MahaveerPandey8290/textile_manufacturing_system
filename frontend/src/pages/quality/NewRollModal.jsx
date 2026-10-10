@@ -18,7 +18,8 @@ export function NewRollModal({ isOpen, onClose }) {
     onSuccess: onClose,
   });
   const fieldErrors = fieldErrorsFrom(createRoll.error);
-  const fabricJobs = jobs?.filter((job) => job.stage !== 'SPINNING' && job.status !== 'COMPLETED') ?? [];
+  // Rolls can still be cut after a job is marked done, as long as the order hasn't shipped.
+  const fabricJobs = jobs?.filter((job) => job.stage !== 'SPINNING' && !['DISPATCHED', 'CANCELLED'].includes(job.order_status)) ?? [];
   const selectedJob = fabricJobs.find((job) => String(job.id) === String(form.productionJobId));
   const updateField = (field) => (event) => setForm((current) => ({ ...current, [field]: event.target.value }));
 
@@ -53,10 +54,10 @@ export function NewRollModal({ isOpen, onClose }) {
           });
         }}
       >
-        <FormField label="From job" hint={selectedJob ? `${selectedJob.order_number} · ${selectedJob.buyer_name} · ${selectedJob.machine_code}` : 'Weaving or dyeing job'}>
+        <FormField label="From job" hint={selectedJob ? `${selectedJob.order_number} · ${selectedJob.buyer_name} · ${selectedJob.machine_code}` : jobs && !fabricJobs.length ? 'No weaving or dyeing job yet. Plan one on the Production floor first.' : 'Weaving or dyeing job'}>
           <select className="select" required value={form.productionJobId} onChange={updateField('productionJobId')}>
             <option value="">Choose job…</option>
-            {fabricJobs.map((job) => <option key={job.id} value={job.id}>{job.job_number} · {job.order_number} · {job.machine_code}</option>)}
+            {fabricJobs.map((job) => <option key={job.id} value={job.id}>{job.job_number} · {job.order_number} · {job.machine_code}{job.status === 'COMPLETED' ? ' (done)' : ''}</option>)}
           </select>
         </FormField>
         <div className="form-grid">

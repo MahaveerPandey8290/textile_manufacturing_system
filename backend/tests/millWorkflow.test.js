@@ -123,6 +123,12 @@ describe('a day at the mill', () => {
     assert.equal(order.body.status, 'READY_TO_DISPATCH');
   });
 
+  test('quality can register rolls too, the store cannot', async () => {
+    const incomplete = { orderId: state.order.id, machineId: state.machine.id };
+    assert.equal((await agents.quality.post('/api/quality/rolls').send(incomplete)).status, 400, 'allowed, so only validation fails');
+    assert.equal((await agents.store.post('/api/quality/rolls').send(incomplete)).status, 403);
+  });
+
   test('dispatch raises a matching invoice and a roll can never go out twice', async () => {
     const rollIds = state.rolls.map((roll) => roll.id);
     const [first, second] = await Promise.all([

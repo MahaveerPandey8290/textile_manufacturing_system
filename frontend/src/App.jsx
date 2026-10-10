@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { useAuth } from './auth/AuthContext';
 import { PlatformRoute, ProtectedRoute } from './auth/ProtectedRoute';
 import { AppShell } from './components/layout/AppShell';
 import { PlatformShell } from './components/platform/PlatformShell';
@@ -42,6 +43,7 @@ const AuditLogPage = lazy(() => import('./pages/admin/AuditLogPage'));
 const OrganizationSettingsPage = lazy(() => import('./pages/admin/OrganizationSettingsPage'));
 const AccountPage = lazy(() => import('./pages/admin/AccountPage'));
 const TrackOrderPage = lazy(() => import('./pages/public/TrackOrderPage'));
+const LandingPage = lazy(() => import('./pages/public/LandingPage'));
 
 const STAFF = ['OWNER', 'PRODUCTION_MANAGER', 'STORE_MANAGER', 'QUALITY_INSPECTOR', 'ACCOUNTANT'];
 
@@ -78,13 +80,7 @@ export function App() {
           <Route path="organizations/:organizationId" element={<OrganizationDetailPage />} />
           <Route path="activity" element={<PlatformActivityPage />} />
         </Route>
-        <Route
-          element={
-            <ProtectedRoute>
-              <AppShell />
-            </ProtectedRoute>
-          }
-        >
+        <Route element={<AppOrLanding />}>
           <Route index element={<DashboardPage />} />
           <Route path="orders" element={<OrdersPage />} />
           <Route path="orders/:orderId" element={<OrderDetailPage />} />
@@ -107,5 +103,18 @@ export function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>
+  );
+}
+
+/** "/" is the public landing page for visitors and the dashboard once signed in. */
+function AppOrLanding() {
+  const { currentUser, isCheckingSession } = useAuth();
+  const location = useLocation();
+  if (isCheckingSession) return <FullPageSpinner />;
+  if (!currentUser && location.pathname === '/') return <LandingPage />;
+  return (
+    <ProtectedRoute>
+      <AppShell />
+    </ProtectedRoute>
   );
 }

@@ -40,11 +40,11 @@ export default function PlatformOverviewPage() {
         <Card title="New organisations" subtitle="Sign-ups per day, last 30 days">
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={chartData} margin={{ top: 8, right: 8, left: -24, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eef1f6" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#efeae0" />
               <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={11} stroke="#8a94a6" interval={4} />
               <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={11} stroke="#8a94a6" />
-              <Tooltip formatter={(value) => [value, 'sign-ups']} cursor={{ fill: '#f4f6fa' }} />
-              <Bar dataKey="signups" fill="#3b5bdb" radius={[4, 4, 0, 0]} maxBarSize={18} />
+              <Tooltip formatter={(value) => [value, 'sign-ups']} cursor={{ fill: '#f6f3ec' }} />
+              <Bar dataKey="signups" fill="#36459a" radius={[4, 4, 0, 0]} maxBarSize={18} />
             </BarChart>
           </ResponsiveContainer>
         </Card>

@@ -23,9 +23,10 @@ qualityRouter.get(
 qualityRouter.get('/rolls/:id', validateRequest({ params: idParams }), async (request, response) =>
   response.json(await qualityService.traceRoll(request.valid.params.id)),
 );
+// Rolls are registered as they come off the loom (production) or at the inspection table (quality).
 qualityRouter.post(
   '/rolls',
-  allowRoles(ROLES.PRODUCTION_MANAGER),
+  allowRoles(ROLES.PRODUCTION_MANAGER, ROLES.QUALITY_INSPECTOR),
   validateRequest({
     body: z.object({
       orderId: z.number().int().positive(),

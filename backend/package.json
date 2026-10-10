@@ -13,7 +13,8 @@
     "db:migrate": "node --env-file-if-exists=.env src/db/migrate.js",
     "db:reset": "node --env-file-if-exists=.env src/db/migrate.js --reset",
     "test": "NODE_ENV=test DATABASE_NAME=textile_mill_test DATABASE_STATEMENT_TIMEOUT_MS=2000 sh -c 'node --env-file-if-exists=.env src/db/migrate.js --reset > /dev/null && node --env-file-if-exists=.env tests/fixtures/seedTestData.js > /dev/null && node --env-file-if-exists=.env --test --test-concurrency=1 \"tests/**/*.test.js\"'",
-    "platform:admin": "node --env-file-if-exists=.env src/db/createPlatformAdmin.js"
+    "platform:admin": "node --env-file-if-exists=.env src/db/createPlatformAdmin.js",
+    "test:orgs": "node --env-file-if-exists=.env src/db/createTestOrganizations.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

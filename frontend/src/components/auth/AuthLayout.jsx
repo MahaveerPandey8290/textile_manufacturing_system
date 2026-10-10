@@ -26,10 +26,10 @@ export function AuthLayout({ organization, backTo, backLabel = 'Back', children 
               <span>{organization.name}</span>
             </div>
           ) : (
-            <div className="auth__platform-chip">
+            <Link to="/" className="auth__platform-chip">
               <PlatformMark size={30} />
               <strong>{PLATFORM_NAME}</strong>
-            </div>
+            </Link>
           )}
         </div>
 

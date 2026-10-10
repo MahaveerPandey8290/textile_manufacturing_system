@@ -7,7 +7,7 @@ import { getRememberedOrganization } from './rememberedOrganization';
 /** Where a signed-out person should start: the sign-in page they used last on this device. */
 export function signedOutPath() {
   const remembered = getRememberedOrganization();
-  if (!remembered) return '/welcome';
+  if (!remembered) return '/';
   return remembered.entry === 'organization' ? '/organization/signin' : `/signin/${remembered.code}`;
 }
 

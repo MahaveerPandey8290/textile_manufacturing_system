@@ -121,7 +121,7 @@ export async function listShifts() {
 export async function listJobs({ status, stage, orderId }) {
   const { rows } = await query(
     `SELECT j.*, m.code AS machine_code, m.name AS machine_name, m.status AS machine_status,
-            o.order_number, o.colour, o.due_date, o.priority, b.company_name AS buyer_name
+            o.order_number, o.colour, o.due_date, o.priority, o.status AS order_status, b.company_name AS buyer_name
        FROM production_jobs j
        JOIN machines m ON m.id = j.machine_id
        JOIN orders o ON o.id = j.order_id

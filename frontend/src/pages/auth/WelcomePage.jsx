@@ -12,7 +12,7 @@ export default function WelcomePage() {
   if (currentUser) return <Navigate to={isPlatformAdmin ? '/platform' : '/'} replace />;
 
   return (
-    <AuthLayout>
+    <AuthLayout backTo="/" backLabel="About MillOS">
       <div className="auth-heading">
         <h2>How would you like to continue?</h2>
         <p className="muted">Choose one to get started.</p>

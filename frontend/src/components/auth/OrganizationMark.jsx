@@ -21,9 +21,9 @@ export function OrganizationMark({ name = '', logoUrl, size = 40, className = ''
 export function PlatformMark({ size = 36 }) {
   return (
     <svg viewBox="0 0 32 32" width={size} height={size} aria-hidden>
-      <rect width="32" height="32" rx="8" fill="#3b5bdb" />
+      <rect width="32" height="32" rx="8" fill="#36459a" />
       <path d="M7 23V9l5 6 4-6 4 6 5-6v14" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" />
-      <path d="M7 26h18" stroke="#2dd4bf" strokeWidth="2.4" strokeLinecap="round" />
+      <path d="M7 26h18" stroke="#e8a93e" strokeWidth="2.4" strokeLinecap="round" />
     </svg>
   );
 }

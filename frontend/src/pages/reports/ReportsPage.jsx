@@ -106,10 +106,10 @@ function MachineOutputReport() {
         <Card title="Utilisation by machine" subtitle="Hours run as a share of available hours (24 h/day)">
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={data} margin={{ left: -16, right: 8 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eef1f6" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#efeae0" />
               <XAxis dataKey="code" tickLine={false} axisLine={false} fontSize={12} />
               <YAxis unit="%" tickLine={false} axisLine={false} fontSize={12} domain={[0, 100]} />
-              <Tooltip formatter={(value) => [`${value}%`, 'utilisation']} cursor={{ fill: '#f4f6fa' }} />
+              <Tooltip formatter={(value) => [`${value}%`, 'utilisation']} cursor={{ fill: '#f6f3ec' }} />
               <Bar dataKey="utilisation_percent" radius={[4, 4, 0, 0]} maxBarSize={32}>
                 {data.map((row) => <Cell key={row.id} fill={row.utilisation_percent >= 60 ? '#12b76a' : row.utilisation_percent >= 30 ? '#f79009' : '#f04438'} />)}
               </Bar>

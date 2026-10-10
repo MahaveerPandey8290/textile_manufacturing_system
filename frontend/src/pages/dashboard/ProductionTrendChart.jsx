@@ -1,7 +1,7 @@
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { formatNumber } from '../../utils/format';
 
-const STAGE_COLOURS = { WEAVING: '#3b5bdb', DYEING: '#14b8a6', SPINNING: '#f79009' };
+const STAGE_COLOURS = { WEAVING: '#36459a', DYEING: '#14b8a6', SPINNING: '#f79009' };
 
 /** 14-day output by stage. Rows from the API are (day, stage, quantity); we pivot them per day. */
 export function ProductionTrendChart({ rows }) {
@@ -15,10 +15,10 @@ export function ProductionTrendChart({ rows }) {
   return (
     <ResponsiveContainer width="100%" height={260}>
       <BarChart data={data} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eef1f6" />
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#efeae0" />
         <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} stroke="#8a94a6" />
         <YAxis tickLine={false} axisLine={false} fontSize={12} stroke="#8a94a6" />
-        <Tooltip formatter={(value, name) => [formatNumber(value, name === 'SPINNING' ? 'kg' : 'm'), name.toLowerCase()]} cursor={{ fill: '#f4f6fa' }} />
+        <Tooltip formatter={(value, name) => [formatNumber(value, name === 'SPINNING' ? 'kg' : 'm'), name.toLowerCase()]} cursor={{ fill: '#f6f3ec' }} />
         <Legend iconType="circle" formatter={(value) => <span style={{ color: '#475467', fontSize: 12 }}>{value.toLowerCase()}</span>} />
         {Object.entries(STAGE_COLOURS).map(([stage, colour]) => (
           <Bar key={stage} dataKey={stage} stackId="output" fill={colour} radius={stage === 'SPINNING' ? [4, 4, 0, 0] : 0} maxBarSize={28} />
