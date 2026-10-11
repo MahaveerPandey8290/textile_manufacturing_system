@@ -4,11 +4,11 @@ import { NAVIGATION, canAccess } from '../../config/navigation';
 import { PLATFORM_NAME } from '../../config/platform';
 import { OrganizationMark } from '../auth/OrganizationMark';
 
-export function Sidebar({ isOpen, onNavigate }) {
+export function Sidebar({ isOpen, isCollapsed, onNavigate }) {
   const { currentUser, organization } = useAuth();
   const isBuyer = currentUser.role === 'BUYER';
   return (
-    <aside className={`sidebar ${isOpen ? 'is-open' : ''}`}>
+    <aside className={`sidebar ${isOpen ? 'is-open' : ''} ${isCollapsed ? 'is-collapsed' : ''}`}>
       <div className="sidebar__brand">
         <OrganizationMark name={organization.name} logoUrl={organization.logoUrl} size={36} className="org-mark--on-dark" />
         <div style={{ minWidth: 0 }}>

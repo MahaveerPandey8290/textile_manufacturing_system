@@ -16,10 +16,32 @@ const PLATFORM_NAVIGATION = [
 /** Frame for the super admin console. Visually distinct from an organisation's app on purpose. */
 export function PlatformShell() {
   const { currentUser, signOut } = useAuth();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('platform_sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleSidebar = () => {
+    if (window.innerWidth <= 900) {
+      setIsMobileOpen((prev) => !prev);
+    } else {
+      setIsDesktopCollapsed((prev) => {
+        const next = !prev;
+        try {
+          localStorage.setItem('platform_sidebar_collapsed', String(next));
+        } catch {}
+        return next;
+      });
+    }
+  };
+
   return (
-    <div className="app-shell app-shell--platform">
-      <aside className={`sidebar sidebar--platform ${isSidebarOpen ? 'is-open' : ''}`}>
+    <div className={`app-shell app-shell--platform ${isDesktopCollapsed ? 'app-shell--collapsed' : ''}`}>
+      <aside className={`sidebar sidebar--platform ${isMobileOpen ? 'is-open' : ''} ${isDesktopCollapsed ? 'is-collapsed' : ''}`}>
         <div className="sidebar__brand">
           <PlatformMark size={32} />
           <div>
@@ -31,7 +53,7 @@ export function PlatformShell() {
           <div className="sidebar__group">
             <div className="sidebar__section">Monitor</div>
             {PLATFORM_NAVIGATION.map((item) => (
-              <NavLink key={item.to} to={item.to} end={item.end} className="sidebar__link" onClick={() => setIsSidebarOpen(false)}>
+              <NavLink key={item.to} to={item.to} end={item.end} className="sidebar__link" onClick={() => setIsMobileOpen(false)}>
                 <item.icon size={18} />
                 <span>{item.label}</span>
               </NavLink>
@@ -40,10 +62,16 @@ export function PlatformShell() {
         </nav>
         <div className="sidebar__footer">Super admin · sees every organisation</div>
       </aside>
-      {isSidebarOpen && <div className="sidebar-scrim" onClick={() => setIsSidebarOpen(false)} />}
+      {isMobileOpen && <div className="sidebar-scrim" onClick={() => setIsMobileOpen(false)} />}
       <div className="app-shell__main">
         <header className="topbar">
-          <button className="icon-button topbar__menu" onClick={() => setIsSidebarOpen(true)} aria-label="Open menu">
+          <button
+            type="button"
+            className="icon-button topbar__menu"
+            onClick={toggleSidebar}
+            aria-label="Toggle navigation menu"
+            title={isDesktopCollapsed ? 'Show sidebar' : 'Hide sidebar (full screen)'}
+          >
             <Menu size={20} />
           </button>
           <span className="platform-badge">Platform console</span>

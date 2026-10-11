@@ -8,7 +8,29 @@ import { Sidebar } from './Sidebar';
 
 export function AppShell() {
   const { currentUser, signOut } = useAuth();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleSidebar = () => {
+    if (window.innerWidth <= 900) {
+      setIsMobileOpen((prev) => !prev);
+    } else {
+      setIsDesktopCollapsed((prev) => {
+        const next = !prev;
+        try {
+          localStorage.setItem('sidebar_collapsed', String(next));
+        } catch {}
+        return next;
+      });
+    }
+  };
+
   const initials = currentUser.fullName
     .split(' ')
     .map((part) => part[0])
@@ -16,12 +38,22 @@ export function AppShell() {
     .join('');
 
   return (
-    <div className="app-shell">
-      <Sidebar isOpen={isSidebarOpen} onNavigate={() => setIsSidebarOpen(false)} />
-      {isSidebarOpen && <div className="sidebar-scrim" onClick={() => setIsSidebarOpen(false)} />}
+    <div className={`app-shell ${isDesktopCollapsed ? 'app-shell--collapsed' : ''}`}>
+      <Sidebar
+        isOpen={isMobileOpen}
+        isCollapsed={isDesktopCollapsed}
+        onNavigate={() => setIsMobileOpen(false)}
+      />
+      {isMobileOpen && <div className="sidebar-scrim" onClick={() => setIsMobileOpen(false)} />}
       <div className="app-shell__main">
         <header className="topbar">
-          <button className="icon-button topbar__menu" onClick={() => setIsSidebarOpen(true)} aria-label="Open menu">
+          <button
+            type="button"
+            className="icon-button topbar__menu"
+            onClick={toggleSidebar}
+            aria-label="Toggle navigation menu"
+            title={isDesktopCollapsed ? 'Show sidebar' : 'Hide sidebar (full screen)'}
+          >
             <Menu size={20} />
           </button>
           <GlobalSearch />
