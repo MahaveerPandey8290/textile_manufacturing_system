@@ -478,6 +478,25 @@ input, select, textarea { font: inherit; color: inherit; }
 .logo-upload.has-error { border-color: var(--tone-danger); }
 .logo-upload__text { display: flex; flex-direction: column; gap: 2px; font-size: 13px; min-width: 0; }
 
+.photo-picker { width: 100%; }
+.photo-dropzone {
+  display: flex; gap: 14px; align-items: center; padding: 12px 16px;
+  border: 1px dashed var(--color-line-strong); border-radius: 12px;
+  background: var(--color-surface-sunken); cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.photo-dropzone:hover, .photo-dropzone:focus-visible { border-color: var(--color-brand); background: var(--color-brand-soft); outline: none; }
+.photo-preview-box {
+  display: flex; gap: 14px; align-items: center; padding: 10px 14px;
+  border: 1px solid var(--color-line); border-radius: 12px;
+  background: var(--color-surface-sunken);
+}
+.photo-preview-img {
+  width: 64px; height: 64px; border-radius: 8px; object-fit: cover;
+  border: 1px solid var(--color-line-strong); flex-shrink: 0;
+}
+.photo-preview-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
 .first-time { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; padding: 14px; border-radius: 12px; background: var(--tone-teal-bg); font-size: 13px; }
 .first-time .button { margin-top: 8px; }
 .success-badge { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--tone-success-bg); color: var(--tone-success); box-shadow: 0 0 0 8px rgba(18, 183, 106, 0.08); }

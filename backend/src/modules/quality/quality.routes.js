@@ -50,6 +50,8 @@ qualityRouter.post(
         result: z.enum(['PASS', 'REWORK', 'REJECT']),
         grade: z.enum(['A', 'B', 'C']).optional().nullable(),
         remarks: z.string().trim().max(500).optional().nullable(),
+        photo: z.string().max(1_000_000, 'Photo must be under 800 KB.').optional().nullable(),
+        photoUrl: z.string().max(1_000_000, 'Photo must be under 800 KB.').optional().nullable(),
         defects: z
           .array(z.object({ defectType: defectTypeSchema, occurrences: z.number().int().positive().max(999), note: z.string().trim().max(200).optional() }))
           .max(20)

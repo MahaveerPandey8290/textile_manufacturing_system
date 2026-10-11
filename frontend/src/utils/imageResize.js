@@ -17,3 +17,25 @@ export async function logoFileToDataUrl(file, maxSize = 256) {
   bitmap.close?.();
   return canvas.toDataURL('image/png');
 }
+
+/**
+ * Resizes an inspection or defect photo to at most `maxSize` px, compressing to a JPEG data URL.
+ * Produces clear photos that stay well under 250 KB for instant uploads.
+ */
+export async function imageFileToDataUrl(file, maxSize = 1024, quality = 0.82) {
+  if (!file) return null;
+  if (!ACCEPTED_TYPES.includes(file.type) && !file.type.startsWith('image/')) {
+    throw new Error('Choose a photo in PNG, JPG or WebP format.');
+  }
+  if (file.size > 10 * 1024 * 1024) throw new Error('Photo must be smaller than 10 MB.');
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+  canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close?.();
+  return canvas.toDataURL('image/jpeg', quality);
+}
+

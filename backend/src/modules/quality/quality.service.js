@@ -78,7 +78,7 @@ export async function traceRoll(rollId) {
   );
   if (!rows[0]) throw notFound('Roll');
   const { rows: inspections } = await query(
-    `SELECT qi.id, qi.result, qi.grade, qi.defect_points, qi.remarks, qi.inspected_at, u.full_name AS inspector_name,
+    `SELECT qi.id, qi.result, qi.grade, qi.defect_points, qi.remarks, qi.photo_url, qi.inspected_at, u.full_name AS inspector_name,
             COALESCE(json_agg(json_build_object('defectType', d.defect_type, 'occurrences', d.occurrences, 'note', d.note))
                      FILTER (WHERE d.id IS NOT NULL), '[]') AS defects
        FROM quality_inspections qi
@@ -94,7 +94,8 @@ export async function traceRoll(rollId) {
 
 // ---------------------------------------------------------------- inspections
 
-export async function inspectRoll(request, { fabricRollId, result, grade, remarks, defects }) {
+export async function inspectRoll(request, { fabricRollId, result, grade, remarks, photo, photoUrl, defects }) {
+  const finalPhoto = photoUrl ?? photo ?? null;
   return withTransaction(async (client) => {
     const { rows } = await client.query('SELECT id, order_id, status, roll_number FROM fabric_rolls WHERE id = $1 FOR UPDATE', [fabricRollId]);
     const roll = rows[0];
@@ -106,9 +107,9 @@ export async function inspectRoll(request, { fabricRollId, result, grade, remark
     // Simplified four-point system: every defect occurrence counts as points against the roll.
     const defectPoints = defects.reduce((total, defect) => total + defect.occurrences, 0);
     const { rows: inspectionRows } = await client.query(
-      `INSERT INTO quality_inspections (fabric_roll_id, inspector_id, result, grade, defect_points, remarks)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [fabricRollId, request.user.id, result, result === 'REJECT' ? null : grade ?? null, defectPoints, remarks ?? null],
+      `INSERT INTO quality_inspections (fabric_roll_id, inspector_id, result, grade, defect_points, remarks, photo_url)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [fabricRollId, request.user.id, result, result === 'REJECT' ? null : grade ?? null, defectPoints, remarks ?? null, finalPhoto],
     );
     const inspection = inspectionRows[0];
     for (const defect of defects) {

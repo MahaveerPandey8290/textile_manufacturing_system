@@ -1,11 +1,12 @@
-import { Minus, Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Camera, Minus, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import { FormField, fieldErrorsFrom } from '../../components/ui/FormField';
 import { Modal } from '../../components/ui/Modal';
 import { DEFECT_LABELS } from '../../config/statuses';
 import { useApiMutation } from '../../hooks/useApi';
 import { formatNumber } from '../../utils/format';
+import { imageFileToDataUrl } from '../../utils/imageResize';
 
 const RESULTS = [
   { id: 'PASS', label: 'Pass', variant: 'success' },
@@ -19,11 +20,17 @@ export function InspectRollModal({ roll, onClose }) {
   const [grade, setGrade] = useState('A');
   const [remarks, setRemarks] = useState('');
   const [defectCounts, setDefectCounts] = useState({});
+  const [photo, setPhoto] = useState(null);
+  const [photoError, setPhotoError] = useState('');
+  const fileInputRef = useRef(null);
+
   useEffect(() => {
     if (roll) {
       setResult('PASS');
       setGrade('A');
       setRemarks('');
+      setPhoto(null);
+      setPhotoError('');
       setDefectCounts({});
     }
   }, [roll]);
@@ -38,6 +45,17 @@ export function InspectRollModal({ roll, onClose }) {
   const changeCount = (defectType, delta) =>
     setDefectCounts((current) => ({ ...current, [defectType]: Math.max(0, (current[defectType] ?? 0) + delta) }));
   const totalPoints = Object.values(defectCounts).reduce((sum, count) => sum + count, 0);
+
+  const handlePhotoSelect = async (file) => {
+    if (!file) return;
+    setPhotoError('');
+    try {
+      const dataUrl = await imageFileToDataUrl(file);
+      setPhoto(dataUrl);
+    } catch (err) {
+      setPhotoError(err.message);
+    }
+  };
 
   return (
     <Modal
@@ -59,6 +77,7 @@ export function InspectRollModal({ roll, onClose }) {
                   result,
                   grade: result === 'REJECT' ? null : grade,
                   remarks: remarks || null,
+                  photo: photo || null,
                   defects: Object.entries(defectCounts).filter(([, count]) => count > 0).map(([defectType, occurrences]) => ({ defectType, occurrences })),
                 },
               })
@@ -105,6 +124,69 @@ export function InspectRollModal({ roll, onClose }) {
           )}
           <FormField label="Remarks" className="span-all">
             <input className="input" value={remarks} onChange={(event) => setRemarks(event.target.value)} placeholder={result === 'PASS' ? 'Optional' : 'What needs fixing?'} maxLength={500} />
+          </FormField>
+
+          <FormField label="Defect / issue photo (optional)" error={photoError || fieldErrors.photo || fieldErrors.photoUrl} className="span-all">
+            <div className="photo-picker">
+              {photo ? (
+                <div className="photo-preview-box">
+                  <img src={photo} alt="Defect preview" className="photo-preview-img" />
+                  <div className="photo-preview-actions">
+                    <button
+                      type="button"
+                      className="button button--secondary button--sm"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Camera size={14} />
+                      <span>Change photo</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="button button--ghost button--sm text-danger"
+                      onClick={() => {
+                        setPhoto(null);
+                        setPhotoError('');
+                        if (fileInputRef.current) fileInputRef.current.value = '';
+                      }}
+                    >
+                      <Trash2 size={14} />
+                      <span>Remove</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  className="photo-dropzone"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => fileInputRef.current?.click()}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click(); }}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    handlePhotoSelect(e.dataTransfer.files?.[0]);
+                  }}
+                >
+                  <Camera size={22} className="muted" />
+                  <div>
+                    <span className="strong">Take or upload a photo of the defect</span>
+                    <span className="muted" style={{ display: 'block', fontSize: 12 }}>
+                      PNG, JPG or WebP (camera or file, compressed automatically)
+                    </span>
+                  </div>
+                </div>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                  handlePhotoSelect(e.target.files?.[0]);
+                  e.target.value = '';
+                }}
+              />
+            </div>
           </FormField>
         </div>
       </div>
