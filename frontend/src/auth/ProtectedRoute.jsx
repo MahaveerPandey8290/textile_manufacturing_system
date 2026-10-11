@@ -28,7 +28,6 @@ export function ProtectedRoute({ roles, children }) {
 export function PlatformRoute({ children }) {
   const { currentUser, isPlatformAdmin, isCheckingSession } = useAuth();
   if (isCheckingSession) return <FullPageSpinner />;
-  if (!currentUser) return <Navigate to="/platform/login" replace />;
-  if (!isPlatformAdmin) return <Navigate to="/" replace />;
+  if (!currentUser || !isPlatformAdmin) return <Navigate to="/platform/login" replace />;
   return children;
 }

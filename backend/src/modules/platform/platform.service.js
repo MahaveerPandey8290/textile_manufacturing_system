@@ -10,25 +10,37 @@ import { forgetOrganization, toBranding } from '../organizations/organizationReg
 
 const SAFE_SCHEMA = /^tenant_[a-z0-9_]+$/;
 
-/** Usage numbers for each schema, keyed by schema name. */
-async function statsForSchemas(schemaNames) {
+/** Usage numbers for each schema, keyed by schema name. Chunked in batches of 35 to prevent query planner timeouts. */
+async function statsForSchemas(schemaNames, chunkSize = 35) {
   const safeNames = schemaNames.filter((name) => SAFE_SCHEMA.test(name));
   if (!safeNames.length) return new Map();
-  const sql = safeNames
-    .map(
-      (schema) => `SELECT '${schema}'::text AS schema_name,
-        (SELECT count(*) FROM "${schema}".users) AS user_count,
-        (SELECT count(*) FROM "${schema}".users WHERE activated_at IS NOT NULL AND is_active) AS active_user_count,
-        (SELECT count(*) FROM "${schema}".users WHERE activated_at IS NULL AND is_active) AS invited_user_count,
-        (SELECT count(*) FROM "${schema}".orders) AS order_count,
-        (SELECT count(*) FROM "${schema}".orders WHERE status NOT IN ('DISPATCHED', 'CANCELLED')) AS open_order_count,
-        (SELECT count(*) FROM "${schema}".machines) AS machine_count,
-        (SELECT COALESCE(sum(total_amount), 0) FROM "${schema}".invoices WHERE invoice_date >= date_trunc('month', CURRENT_DATE)) AS revenue_this_month,
-        (SELECT max(last_login_at) FROM "${schema}".users) AS last_sign_in_at`,
-    )
-    .join('\nUNION ALL\n');
-  const { rows } = await query(sql);
-  return new Map(rows.map((row) => [row.schema_name, row]));
+
+  const chunks = [];
+  for (let i = 0; i < safeNames.length; i += chunkSize) {
+    chunks.push(safeNames.slice(i, i + chunkSize));
+  }
+
+  const results = await Promise.all(
+    chunks.map(async (chunk) => {
+      const sql = chunk
+        .map(
+          (schema) => `SELECT '${schema}'::text AS schema_name,
+            (SELECT count(*) FROM "${schema}".users) AS user_count,
+            (SELECT count(*) FROM "${schema}".users WHERE activated_at IS NOT NULL AND is_active) AS active_user_count,
+            (SELECT count(*) FROM "${schema}".users WHERE activated_at IS NULL AND is_active) AS invited_user_count,
+            (SELECT count(*) FROM "${schema}".orders) AS order_count,
+            (SELECT count(*) FROM "${schema}".orders WHERE status NOT IN ('DISPATCHED', 'CANCELLED')) AS open_order_count,
+            (SELECT count(*) FROM "${schema}".machines) AS machine_count,
+            (SELECT COALESCE(sum(total_amount), 0) FROM "${schema}".invoices WHERE invoice_date >= date_trunc('month', CURRENT_DATE)) AS revenue_this_month,
+            (SELECT max(last_login_at) FROM "${schema}".users) AS last_sign_in_at`,
+        )
+        .join('\nUNION ALL\n');
+      const { rows } = await query(sql);
+      return rows;
+    }),
+  );
+
+  return new Map(results.flat().map((row) => [row.schema_name, row]));
 }
 
 const EMPTY_STATS = {

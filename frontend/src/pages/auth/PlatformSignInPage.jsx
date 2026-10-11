@@ -16,7 +16,7 @@ export default function PlatformSignInPage() {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  if (currentUser) return <Navigate to={isPlatformAdmin ? '/platform' : '/'} replace />;
+  if (currentUser && isPlatformAdmin) return <Navigate to="/platform" replace />;
 
   const submit = async (event) => {
     event.preventDefault();
@@ -38,6 +38,11 @@ export default function PlatformSignInPage() {
         <h2>{PLATFORM_NAME} admin console</h2>
         <p className="muted">For the team that runs the platform. Organisations sign in from the <Link to="/welcome">main page</Link>.</p>
       </div>
+      {currentUser && !isPlatformAdmin && (
+        <div className="callout callout--info" style={{ marginBottom: 14 }}>
+          Currently signed in as <strong>{currentUser.fullName}</strong>. Sign in below with platform admin credentials to access the console.
+        </div>
+      )}
       {errorMessage && <div className="callout callout--danger">{errorMessage}</div>}
       <form className="auth-form" onSubmit={submit}>
         <FormField label="Email">
