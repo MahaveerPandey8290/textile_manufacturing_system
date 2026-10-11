@@ -68,6 +68,7 @@ export async function getDashboard(user) {
               (SELECT COALESCE(sum(total_amount - amount_paid), 0) FROM invoices WHERE status <> 'PAID' AND due_date < CURRENT_DATE) AS overdue_receivables,
               (SELECT COALESCE(sum(total_amount - amount_paid), 0) FROM yarn_receipts) AS payables,
               (SELECT COALESCE(sum(subtotal), 0) FROM invoices WHERE invoice_date >= date_trunc('month', CURRENT_DATE)) AS revenue_this_month,
+              (SELECT COALESCE(sum(subtotal), 0) FROM invoices WHERE invoice_date >= date_trunc('month', CURRENT_DATE)) AS invoicing_this_month,
               (SELECT COALESCE(sum(amount), 0) FROM buyer_payments WHERE paid_on >= date_trunc('month', CURRENT_DATE)) AS collections_this_month`,
     );
     dashboard.finance = rows[0];

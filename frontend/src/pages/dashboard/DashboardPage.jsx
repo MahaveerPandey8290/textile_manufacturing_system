@@ -75,7 +75,7 @@ function MillDashboard() {
         {finance && (
           <>
             <StatCard label="Receivable" value={formatRupeesShort(finance.receivables)} hint={`${formatRupeesShort(finance.overdue_receivables)} overdue`} icon={Wallet} tone="danger" onClick={() => navigate('/finance')} />
-            <StatCard label="Revenue this month" value={formatRupeesShort(finance.revenue_this_month)} hint={`${formatRupeesShort(finance.collections_this_month)} collected`} icon={IndianRupee} tone="success" onClick={() => navigate('/reports')} />
+            <StatCard label="Invoicing this month" value={formatRupeesShort(finance.invoicing_this_month ?? finance.revenue_this_month)} hint={`${formatRupeesShort(finance.collections_this_month)} collected`} icon={IndianRupee} tone="success" onClick={() => navigate('/reports')} />
           </>
         )}
       </div>

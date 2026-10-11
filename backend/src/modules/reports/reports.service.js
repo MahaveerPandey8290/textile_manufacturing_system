@@ -25,17 +25,22 @@ export async function getMonthlyProfitAndLoss({ month }) {
   // Until payroll is generated for the month, fall back to labour cost logged on the floor.
   const wages = figures.payroll_wages ?? figures.logged_labour_cost;
   const totalCost = roundTo2(figures.yarn_consumed_cost + figures.machine_running_cost + wages);
+  const totalExpenses = totalCost;
+  const invoicing = figures.revenue;
   const netCash = roundTo2(figures.cash_from_buyers - figures.cash_to_suppliers - figures.wages_paid);
+  const expensesBreakdown = {
+    yarnConsumed: figures.yarn_consumed_cost,
+    machineRunning: figures.machine_running_cost,
+    wages,
+    wagesSource: figures.payroll_wages === null ? 'production logs (payroll not generated yet)' : 'payroll',
+    total: totalExpenses,
+  };
   return {
     month,
     revenue: figures.revenue,
-    costs: {
-      yarnConsumed: figures.yarn_consumed_cost,
-      machineRunning: figures.machine_running_cost,
-      wages,
-      wagesSource: figures.payroll_wages === null ? 'production logs (payroll not generated yet)' : 'payroll',
-      total: totalCost,
-    },
+    invoicing,
+    costs: expensesBreakdown,
+    expenses: expensesBreakdown,
     operatingProfit: roundTo2(figures.revenue - totalCost),
     profitMarginPercent: figures.revenue > 0 ? roundTo2(((figures.revenue - totalCost) / figures.revenue) * 100) : null,
     cash: {
@@ -54,6 +59,7 @@ export async function getOrderCosting({ month }) {
     `SELECT o.id, o.order_number, o.status, o.quantity_meters, o.rate_per_meter, b.company_name AS buyer_name,
             f.name AS fabric_name, p.dispatched_meters, p.passed_meters,
             c.material_cost, c.labour_cost, c.machine_cost, c.total_cost,
+            c.total_cost AS expenses,
             round(o.quantity_meters * o.rate_per_meter, 2) AS order_value,
             CASE WHEN p.produced_meters > 0 THEN round(c.total_cost / p.produced_meters, 2) END AS cost_per_meter,
             round(o.quantity_meters * o.rate_per_meter - c.total_cost, 2) AS projected_margin

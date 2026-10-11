@@ -47,7 +47,7 @@ function OrderCostingReport() {
   return (
     <>
       <div className="toolbar">
-        <span className="soft">Cost = yarn issued (at weighted average cost) + operator wages + machine running cost, from real floor entries.</span>
+        <span className="soft">Expenses = yarn issued (at weighted average cost) + operator wages + machine running cost, from real floor entries.</span>
         <Button
           size="sm"
           variant="secondary"
@@ -61,7 +61,7 @@ function OrderCostingReport() {
               { header: 'Yarn', value: (row) => row.material_cost },
               { header: 'Labour', value: (row) => row.labour_cost },
               { header: 'Machine', value: (row) => row.machine_cost },
-              { header: 'Total cost', value: (row) => row.total_cost },
+              { header: 'Expenses', value: (row) => row.expenses ?? row.total_cost },
               { header: 'Cost per meter', value: (row) => row.cost_per_meter },
               { header: 'Projected margin', value: (row) => row.projected_margin },
             ], data)
@@ -82,7 +82,7 @@ function OrderCostingReport() {
           { key: 'material_cost', header: 'Yarn', align: 'right', render: (row) => formatCurrency(row.material_cost) },
           { key: 'labour_cost', header: 'Labour', align: 'right', render: (row) => formatCurrency(row.labour_cost) },
           { key: 'machine_cost', header: 'Machine', align: 'right', render: (row) => formatCurrency(row.machine_cost) },
-          { key: 'total_cost', header: 'Total cost', align: 'right', render: (row) => <strong>{formatCurrency(row.total_cost)}</strong> },
+          { key: 'total_cost', header: 'Expenses', align: 'right', render: (row) => <strong>{formatCurrency(row.expenses ?? row.total_cost)}</strong> },
           { key: 'cost_per_meter', header: '₹ / meter', align: 'right', render: (row) => (row.cost_per_meter ? `${formatCurrency(row.cost_per_meter)} vs ${formatCurrency(row.rate_per_meter)}` : '—') },
           { key: 'projected_margin', header: 'Margin', align: 'right', render: (row) => <strong className={row.projected_margin < 0 ? 'text-danger' : 'text-success'}>{formatCurrency(row.projected_margin)}</strong> },
         ]}
